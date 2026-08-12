@@ -35,6 +35,7 @@ constexpr UINT kFinishSelfTest = WM_APP + 0x270;
 constexpr UINT kRestartViewer = WM_APP + 0x271;
 
 struct PdfDocument {
+    // The model owns the canonical path; tabs are only its native projection.
     mwfl::TabId id{};
     std::filesystem::path path;
 };
@@ -65,6 +66,8 @@ std::filesystem::path InitialPdfFromCommandLine() {
 }
 
 bool WriteSelfTestPdf(const std::filesystem::path& path) {
+    // A hermetic fixture exercises real local-file navigation without shipping
+    // a binary test document in the repository.
     std::string pdf = "%PDF-1.4\n";
     std::vector<std::size_t> offsets;
     const auto object = [&](int id, std::string_view body) {
@@ -274,6 +277,8 @@ class PdfViewerWindow final : public mwfl::WindowBase {
         if (self_test_ || showcase_)
             user_data_folder_ = std::filesystem::temp_directory_path() /
                                 (L"mwfl-pdf-viewer-" + std::to_wstring(::GetCurrentProcessId()));
+        // Callbacks run on this window's STA. Process recovery is posted back so
+        // it never re-enters the WebView2 controller from a failure callback.
         const bool started = viewer_.Initialize(
             {.user_data_folder = user_data_folder_},
             {.initialized =
