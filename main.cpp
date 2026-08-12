@@ -1,6 +1,8 @@
 #include <mwfl/mwfl.h>
 #include <mwfl/webview2.h>
 
+#include "resource.h"
+
 #include <shlwapi.h>
 #include <shellapi.h>
 
@@ -147,7 +149,7 @@ class PdfViewerWindow final : public mwfl::WindowBase {
 
         mwfl::Must(tabs_model_.Add({kWelcomeTab, L"Welcome", false, false}), "add PDF welcome tab");
         mwfl::Must(tabs_.Synchronize(tabs_model_), "show PDF welcome tab");
-        mwfl::ApplyWindowAppearance(GetHwnd(), {mwfl::ColorMode::system, mwfl::Backdrop::mica});
+        SetAppearance({mwfl::ColorMode::system, mwfl::Backdrop::mica});
         StartViewer();
 
         mwfl::SavedWindowPlacement placement;
@@ -426,9 +428,12 @@ class PdfViewerWindow final : public mwfl::WindowBase {
 }  // namespace
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int show_command) {
+    const HICON icon = ::LoadIconW(instance, MAKEINTRESOURCEW(IDI_PDF_READER));
     return mwfl::RunApplication<PdfViewerWindow>(instance, show_command,
                                                  {.title = L"MWFL PDF Reader",
                                                   .initial_bounds = {{}, {1120.0_dip, 780.0_dip}},
-                                                  .use_default_bounds = false},
+                                                   .use_default_bounds = false,
+                                                   .icon = icon,
+                                                   .small_icon = icon},
                                                  {.com_apartment = mwfl::ComApartment::sta});
 }

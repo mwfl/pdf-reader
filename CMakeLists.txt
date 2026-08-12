@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(pdf_reader VERSION 0.1.0 LANGUAGES CXX)
+project(pdf_reader VERSION 0.1.1 LANGUAGES CXX)
 
 include(FetchContent)
 option(PDF_READER_USE_LOCAL_MWFL "Use a local mwfl checkout" OFF)
@@ -10,11 +10,12 @@ set(MWFL_BUILD_WEBVIEW2 ON CACHE BOOL "" FORCE)
 if(PDF_READER_USE_LOCAL_MWFL)
     add_subdirectory("${PDF_READER_MWFL_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/mwfl")
 else()
-    FetchContent_Declare(mwfl GIT_REPOSITORY https://github.com/mwfl/mwfl.git GIT_TAG v0.1.0)
+    FetchContent_Declare(mwfl GIT_REPOSITORY https://github.com/mwfl/mwfl.git GIT_TAG v0.1.2)
     FetchContent_MakeAvailable(mwfl)
 endif()
 
-add_executable(pdf-reader WIN32 main.cpp app.manifest)
+add_executable(pdf-reader WIN32
+    main.cpp pdf_reader.rc resource.h app-icon.ico app.manifest)
 target_link_libraries(pdf-reader PRIVATE mwfl::webview2 shlwapi shell32)
 target_compile_features(pdf-reader PRIVATE cxx_std_20)
 target_compile_definitions(pdf-reader PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
