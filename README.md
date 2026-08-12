@@ -21,6 +21,10 @@ MWFL PDF Reader is a clean native Windows workspace for reading local PDF docume
 - Windows 10 or Windows 11, x64.
 - Microsoft Edge WebView2 Runtime. Windows 11 normally includes it.
 
+## Download
+
+Download the versioned `windows-x64-portable.zip` from [GitHub Releases](https://github.com/mwfl/pdf-reader/releases), verify it with the accompanying SHA-256 file, and extract it anywhere. The Microsoft Edge WebView2 Runtime remains a system prerequisite.
+
 ## Build
 
 ```powershell
@@ -32,3 +36,5 @@ ctest --preset vs2026-x64-release
 Visual Studio 2022 is also supported. A standalone `vs2022-x64` build fetches the pinned mwfl v0.1.0 source and WebView2 SDK; the runtime itself remains a system prerequisite.
 
 The automated test creates a valid one-page PDF, opens it through WebView2, verifies navigation and native tab state, and removes its temporary data afterward.
+
+Use `pdf-reader.exe --showcase` to open a generated, disposable demonstration document.

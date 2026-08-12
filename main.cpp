@@ -74,7 +74,13 @@ bool WriteSelfTestPdf(const std::filesystem::path& path) {
     object(3,
            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
            "/Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>");
-    constexpr std::string_view content = "BT /F1 24 Tf 72 720 Td (MWFL PDF Reader) Tj ET";
+    constexpr std::string_view content =
+        "BT /F1 28 Tf 72 720 Td (MWFL PDF Reader) Tj "
+        "0 -48 Td /F1 16 Tf (A native, local PDF workspace for Windows) Tj "
+        "0 -52 Td /F1 13 Tf (Open multiple documents in tabs) Tj "
+        "0 -24 Td (Drag and drop local PDF files) Tj "
+        "0 -24 Td (Navigate with native menus and shortcuts) Tj "
+        "0 -24 Td (Documents stay on this PC) Tj ET";
     object(4, std::string{"<< /Length "} + std::to_string(content.size()) + " >>\nstream\n" +
                   std::string(content) + "\nendstream");
     object(5, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
@@ -97,7 +103,9 @@ class PdfViewerWindow final : public mwfl::WindowBase {
     void BuildUI() override {
         self_test_ =
             std::wstring_view{::GetCommandLineW()}.find(L"--self-test") != std::wstring_view::npos;
-        if (!self_test_) {
+        showcase_ =
+            std::wstring_view{::GetCommandLineW()}.find(L"--showcase") != std::wstring_view::npos;
+        if (!self_test_ && !showcase_) {
             const auto loaded = mwfl::LoadRecentFilesFromRegistry(HKEY_CURRENT_USER, kSettingsKey,
                                                                   recent_.GetMaximumEntries());
             if (loaded.Succeeded()) recent_ = std::move(*loaded.value);
@@ -184,14 +192,14 @@ class PdfViewerWindow final : public mwfl::WindowBase {
     }
 
     mwfl::EventResult OnClose() override {
-        if (!self_test_) {
+        if (!self_test_ && !showcase_) {
             mwfl::SavedWindowPlacement placement;
             if (mwfl::CaptureWindowPlacement(GetHwnd(), placement))
                 static_cast<void>(mwfl::SaveWindowPlacementToRegistry(
                     HKEY_CURRENT_USER, kSettingsKey, L"WindowPlacement", placement));
         }
         viewer_.Close();
-        if (self_test_) {
+        if (self_test_ || showcase_) {
             std::error_code ignored;
             std::filesystem::remove_all(user_data_folder_, ignored);
             std::filesystem::remove(self_test_pdf_, ignored);
@@ -261,7 +269,7 @@ class PdfViewerWindow final : public mwfl::WindowBase {
     }
 
     void StartViewer() {
-        if (self_test_)
+        if (self_test_ || showcase_)
             user_data_folder_ = std::filesystem::temp_directory_path() /
                                 (L"mwfl-pdf-viewer-" + std::to_wstring(::GetCurrentProcessId()));
         const bool started = viewer_.Initialize(
@@ -279,6 +287,14 @@ class PdfViewerWindow final : public mwfl::WindowBase {
                      }
                      if (const auto initial = InitialPdfFromCommandLine(); !initial.empty())
                          OpenPath(initial);
+                     else if (showcase_) {
+                         self_test_pdf_ = std::filesystem::temp_directory_path() /
+                                          L"mwfl-pdf-reader-demo.pdf";
+                         if (WriteSelfTestPdf(self_test_pdf_))
+                             OpenPath(self_test_pdf_);
+                         else
+                             status_.SetText(L"The showcase PDF could not be created");
+                     }
                      else
                          ShowWelcome();
                  },
@@ -347,7 +363,7 @@ class PdfViewerWindow final : public mwfl::WindowBase {
         tabs_model_.Add({id, path.filename().wstring(), false, true});
         tabs_model_.Select(id);
         tabs_.Synchronize(tabs_model_);
-        if (!self_test_) {
+        if (!self_test_ && !showcase_) {
             recent_.Add(path);
             RefreshRecentCommands();
             BuildMenu();
@@ -403,6 +419,7 @@ class PdfViewerWindow final : public mwfl::WindowBase {
     std::error_code equivalence_error_;
     std::uint64_t next_tab_id_ = 2;
     bool self_test_ = false;
+    bool showcase_ = false;
     bool self_test_pdf_started_ = false;
     bool navigation_succeeded_ = false;
 };
