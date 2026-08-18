@@ -2,6 +2,7 @@
 #include <mwfl/webview2.h>
 
 #include "resource.h"
+#include "update_checker.h"
 
 #include <shlwapi.h>
 #include <shellapi.h>
@@ -19,6 +20,8 @@
 using mwfl::operator""_dip;
 
 namespace {
+
+mwfl_examples::UpdateChecker g_update_checker;
 constexpr mwfl::ControlId kOpen{1600};
 constexpr mwfl::ControlId kCloseTab{1601};
 constexpr mwfl::ControlId kBack{1602};
@@ -159,6 +162,10 @@ class PdfViewerWindow final : public mwfl::WindowBase {
         if (!self_test_ && mwfl::LoadWindowPlacementFromRegistry(HKEY_CURRENT_USER, kSettingsKey,
                                                                  L"WindowPlacement", placement))
             mwfl::RestoreWindowPlacement(GetHwnd(), placement);
+        g_update_checker.Attach(
+            GetHwnd(), {L"MWFL PDF Reader", L"pdf-reader", MWFL_APP_VERSION,
+                        L"Software\\mwfl\\PdfViewer\\Updates"},
+            !self_test_ && !showcase_);
     }
 
     mwfl::EventResult OnCommand(const mwfl::CommandEvent& event) override {

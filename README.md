@@ -38,3 +38,7 @@ Visual Studio 2022 is also supported. A standalone `vs2022-x64` build fetches th
 The automated test creates a valid one-page PDF, opens it through WebView2, verifies navigation and native tab state, and removes its temporary data afterward.
 
 Use `pdf-reader.exe --showcase` to open a generated, disposable demonstration document.
+
+## Updates and Portable releases
+
+The app checks the latest stable GitHub Release at most once per day. Use **Settings > Automatically Check for Updates** to disable or re-enable checks, or **Check for Updates** to run one manually. An available update can open the official Portable release, be deferred for three days or one week, or dismissed until the next day. Tag releases publish a versioned `windows-x64-portable.zip` plus a SHA-256 checksum; replacement is always an explicit download-and-extract action.

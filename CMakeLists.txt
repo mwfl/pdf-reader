@@ -15,10 +15,10 @@ else()
 endif()
 
 add_executable(pdf-reader WIN32
-    main.cpp pdf_reader.rc resource.h app-icon.ico app.manifest)
-target_link_libraries(pdf-reader PRIVATE mwfl::ui mwfl::webview2 shlwapi shell32)
+    main.cpp update_checker.cpp update_checker.h pdf_reader.rc resource.h app-icon.ico app.manifest)
+target_link_libraries(pdf-reader PRIVATE mwfl::ui mwfl::webview2 shlwapi shell32 winhttp comctl32 advapi32)
 target_compile_features(pdf-reader PRIVATE cxx_std_20)
-target_compile_definitions(pdf-reader PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_compile_definitions(pdf-reader PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN NOMINMAX MWFL_APP_VERSION=L\"${PROJECT_VERSION}\")
 if(MSVC)
     target_compile_options(pdf-reader PRIVATE /W4 /WX /permissive- /EHsc /utf-8)
 endif()
