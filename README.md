@@ -33,7 +33,7 @@ cmake --build --preset vs2026-x64-release
 ctest --preset vs2026-x64-release
 ```
 
-Visual Studio 2022 is also supported. A standalone `vs2022-x64` build fetches the pinned mwfl v0.1.0 source and WebView2 SDK; the runtime itself remains a system prerequisite.
+Visual Studio 2022 is also supported. A standalone `vs2022-x64` build fetches the pinned MWFL Foundation baseline and WebView2 SDK; the runtime itself remains a system prerequisite.
 
 The automated test creates a valid one-page PDF, opens it through WebView2, verifies navigation and native tab state, and removes its temporary data afterward.
 
