@@ -2,7 +2,7 @@
 #include <mwfl/webview2.h>
 
 #include "resource.h"
-#include "update_checker.h"
+#include <mwfl/app_support/update_checker.h>
 
 #include <shlwapi.h>
 #include <shellapi.h>
@@ -21,7 +21,7 @@ using mwfl::operator""_dip;
 
 namespace {
 
-mwfl_examples::UpdateChecker g_update_checker;
+mwfl::app_support::UpdateChecker g_update_checker;
 constexpr mwfl::ControlId kOpen{1600};
 constexpr mwfl::ControlId kCloseTab{1601};
 constexpr mwfl::ControlId kBack{1602};
