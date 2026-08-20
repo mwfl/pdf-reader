@@ -24,7 +24,9 @@ endif()
 
 enable_testing()
 add_test(NAME pdf-reader.gui COMMAND pdf-reader --self-test)
-set_tests_properties(pdf-reader.gui PROPERTIES TIMEOUT 45)
+# WebView2 startup and its built-in PDF renderer can be slow on a cold CI
+# runner. The executable still reports functional failures immediately.
+set_tests_properties(pdf-reader.gui PROPERTIES TIMEOUT 120)
 
 install(TARGETS pdf-reader RUNTIME DESTINATION . COMPONENT Application)
 install(FILES README.md LICENSE DESTINATION . COMPONENT Application)
